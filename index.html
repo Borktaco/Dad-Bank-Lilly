@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dad's Bank for Lilly</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+
+        body {
+            font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+            background-color:#0b1b3b;
+            background-image:url('https://borktaco.github.io/Penguin/Unknown.jpeg');
+            background-size:300px 300px;
+            background-repeat:repeat;
+            min-height:100vh;
+            padding:20px 15px;
+            overflow-x:hidden;
+        }
+
+        .container { max-width:600px; margin:0 auto; }
+
+        .header {
+            background:rgba(3,169,244,0.9);
+            backdrop-filter:blur(4px);
+            border-radius:20px;
+            padding:25px 20px;
+            text-align:center;
+            box-shadow:0 8px 20px rgba(0,0,0,0.4);
+            margin-bottom:20px;
+        }
+
+        .header h1 {
+            color:white;
+            font-size:28px;
+            font-weight:700;
+            margin-bottom:5px;
+            text-shadow:2px 2px 4px rgba(0,0,0,0.35);
+        }
+
+        .header .subtitle {
+            color:rgba(255,255,255,0.95);
+            font-size:14px;
+            font-weight:500;
+        }
+
+        .balance-card,
+        .input-section,
+        .history-section {
+            background:rgba(255,255,255,0.82);
+            backdrop-filter:blur(8px);
+            border-radius:20px;
+            padding:20px;
+            margin-bottom:15px;
+            box-shadow:0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .history-section {
+            margin-bottom:20px;
+            max-height:400px;
+            overflow-y:auto;
+        }
+
+        .balance-header {
+            font-size:14px;
+            color:#555;
+            font-weight:600;
+            margin-bottom:8px;
+            text-transform:uppercase;
+            letter-spacing:0.5px;
+        }
+
+        .balance-amount {
+            font-size:36px;
+            font-weight:700;
+            color:#0b1b3b;
+            margin-bottom:15px;
+        }
+
+        .balance-grid {
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:12px;
+            margin-top:15px;
+        }
+
+        .balance-item {
+            background:linear-gradient(135deg,#42a5f5,#7e57c2);
+            padding:15px;
+            border-radius:15px;
+            color:white;
+        }
+
+        .balance-item.btc {
+            background:linear-gradient(135deg,#26c6da,#ab47bc);
+        }
+
+        .balance-label {
+            font-size:11px;
+            opacity:0.9;
+            margin-bottom:5px;
+            font-weight:500;
+        }
+
+        .balance-value { font-size:20px; font-weight:700; }
+
+        .input-group { margin-bottom:15px; }
+
+        .input-group label {
+            display:block;
+            font-size:13px;
+            color:#555;
+            margin-bottom:8px;
+            font-weight:600;
+        }
+
+        .input-group input {
+            width:100%;
+            padding:15px;
+            border:2px solid #e0e0e0;
+            border-radius:12px;
+            font-size:16px;
+            transition:all 0.3s;
+            background:#f8f9fa;
+        }
+
+        .input-group input:focus {
+            outline:none;
+            border-color:#42a5f5;
+            background:white;
+        }
+
+        .button-group {
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:12px;
+            margin-bottom:15px;
+        }
+
+        .btn {
+            padding:18px;
+            border:none;
+            border-radius:15px;
+            font-size:16px;
+            font-weight:700;
+            cursor:pointer;
+            transition:all 0.3s;
+            box-shadow:0 4px 10px rgba(0,0,0,0.2);
+            text-transform:uppercase;
+            letter-spacing:0.5px;
+        }
+
+        .btn-add {
+            background:linear-gradient(135deg,#43a047,#66bb6a);
+            color:white;
+        }
+
+        .btn-spend {
+            background:linear-gradient(135deg,#e53935,#ff7043);
+            color:white;
+        }
+
+        .btn:active { transform:scale(0.95); }
+
+        .bitcoin-section {
+            background:rgba(21,101,192,0.9);
+            backdrop-filter:blur(4px);
+            border-radius:20px;
+            padding:20px;
+            margin-bottom:15px;
+            box-shadow:0 4px 15px rgba(0,0,0,0.3);
+            color:white;
+        }
+
+        .bitcoin-header {
+            font-size:16px;
+            font-weight:700;
+            margin-bottom:15px;
+            text-transform:uppercase;
+            letter-spacing:1px;
+        }
+
+        .bitcoin-grid { display:grid; gap:10px; }
+
+        .bitcoin-item {
+            background:rgba(255,255,255,0.18);
+            padding:12px 15px;
+            border-radius:12px;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+        }
+
+        .bitcoin-item label {
+            font-size:13px;
+            font-weight:600;
+        }
+
+        .bitcoin-item input {
+            width:150px;
+            padding:8px 12px;
+            border:none;
+            border-radius:8px;
+            font-size:15px;
+            font-weight:600;
+            text-align:right;
+            background:white;
+            color:#0b1b3b;
+        }
+
+        .btc-meta { font-size:11px; margin-top:8px; opacity:0.95; }
+
+        .history-header {
+            font-size:16px;
+            font-weight:700;
+            color:#0b1b3b;
+            margin-bottom:15px;
+            text-transform:uppercase;
+            letter-spacing:0.5px;
+        }
+
+        .history-item {
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            padding:12px 0;
+            border-bottom:1px solid #f0f0f0;
+        }
+
+        .history-item:last-child { border-bottom:none; }
+
+        .history-left { flex:1; }
+
+        .history-date {
+            font-size:11px;
+            color:#888;
+            font-weight:600;
+        }
+
+        .history-desc {
+            font-size:14px;
+            color:#0b1b3b;
+            font-weight:600;
+            margin-top:2px;
+        }
+
+        .history-right { text-align:right; }
+
+        .history-amount {
+            font-size:16px;
+            font-weight:700;
+            margin-bottom:2px;
+        }
+
+        .history-amount.positive { color:#43a047; }
+        .history-amount.negative { color:#e53935; }
+
+        .history-balance {
+            font-size:11px;
+            color:#888;
+            font-weight:600;
+        }
+
+        .notification {
+            position:fixed;
+            top:20px;
+            left:50%;
+            transform:translateX(-50%);
+            background:white;
+            padding:15px 25px;
+            border-radius:12px;
+            box-shadow:0 4px 20px rgba(0,0,0,0.35);
+            font-weight:600;
+            z-index:1000;
+            display:none;
+        }
+
+        .notification.show {
+            display:block;
+            animation:slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from { transform:translateX(-50%) translateY(-20px); opacity:0; }
+            to { transform:translateX(-50%) translateY(0); opacity:1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Dad's Bank</h1>
+            <div class="subtitle">for Lilly</div>
+        </div>
+
+        <div class="balance-card">
+            <div class="balance-header">Total Portfolio</div>
+            <div class="balance-amount" id="totalBalance">$0.00</div>
+
+            <div class="balance-grid">
+                <div class="balance-item">
+                    <div class="balance-label">Checking</div>
+                    <div class="balance-value" id="checkingBalance">$0.00</div>
+                </div>
+                <div class="balance-item btc">
+                    <div class="balance-label">Bitcoin Value</div>
+                    <div class="balance-value" id="bitcoinBalance">$0.00</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="input-section">
+            <div class="input-group">
+                <label>Amount</label>
+                <input type="number" id="amountInput" placeholder="0.00" step="0.01" inputmode="decimal">
+            </div>
+            <div class="input-group">
+                <label>Description</label>
+                <input type="text" id="descInput" placeholder="What's this for?">
+            </div>
+            <div class="button-group">
+                <button class="btn btn-add" onclick="addMoney()">Add Money</button>
+                <button class="btn btn-spend" onclick="spendMoney()">Spend Money</button>
+            </div>
+        </div>
+
+        <div class="bitcoin-section">
+            <div class="bitcoin-header">Bitcoin Tracker</div>
+            <div class="bitcoin-grid">
+                <div class="bitcoin-item">
+                    <label>Bitcoin Amount</label>
+                    <input type="number" id="btcAmount" value="0" step="0.00000001" onchange="updateBitcoinFromInputs()" inputmode="decimal">
+                </div>
+                <div class="bitcoin-item">
+                    <label>BTC Price (USD)</label>
+                    <input type="number" id="btcPrice" value="0" step="0.01" onchange="updateBitcoinFromInputs()" inputmode="decimal">
+                </div>
+            </div>
+            <div class="btc-meta" id="btcMetaText"></div>
+        </div>
+
+        <div class="history-section">
+            <div class="history-header">Transaction History</div>
+            <div id="historyList"></div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification"></div>
+
+    <script>
+        const STORAGE_KEY = 'dadsBankLilly_v1';
+
+        let checkingBalance = 0;
+        let btcAmount = 0;
+        let btcPrice = 0;
+
+        const btcMetaText = document.getElementById('btcMetaText');
+        let transactions = [];
+
+        function saveState() {
+            const state = { checkingBalance, btcAmount, btcPrice, transactions };
+            try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+        }
+
+        function loadState() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (!raw) return;
+                const state = JSON.parse(raw);
+                if (typeof state.checkingBalance === 'number') checkingBalance = state.checkingBalance;
+                if (typeof state.btcAmount === 'number') {
+                    btcAmount = state.btcAmount;
+                    document.getElementById('btcAmount').value = btcAmount;
+                }
+                if (typeof state.btcPrice === 'number') {
+                    btcPrice = state.btcPrice;
+                    document.getElementById('btcPrice').value = btcPrice.toFixed(2);
+                }
+                if (Array.isArray(state.transactions)) transactions = state.transactions;
+            } catch (e) {}
+        }
+
+        function formatMoney(amount) {
+            return '$' + Math.abs(amount).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+        }
+
+        function updateDisplay() {
+            const btcValue = btcAmount * btcPrice;
+            const total = checkingBalance + btcValue;
+            document.getElementById('checkingBalance').textContent = formatMoney(checkingBalance);
+            document.getElementById('bitcoinBalance').textContent = isNaN(btcValue) ? '$0.00' : formatMoney(btcValue);
+            document.getElementById('totalBalance').textContent = isNaN(total) ? '$0.00' : formatMoney(total);
+        }
+
+        function updateBitcoinFromInputs() {
+            btcAmount = parseFloat(document.getElementById('btcAmount').value) || 0;
+            btcPrice  = parseFloat(document.getElementById('btcPrice').value) || 0;
+            updateDisplay();
+            saveState();
+        }
+
+        async function fetchBtcPrice() {
+            try {
+                const res = await fetch('https://api.coinbase.com/v2/prices/BTC-USD/spot');
+                const data = await res.json();
+                const price = parseFloat(data.data.amount);
+                if (!isNaN(price)) {
+                    btcPrice = price;
+                    document.getElementById('btcPrice').value = price.toFixed(2);
+                    const now = new Date();
+                    btcMetaText.textContent = 'Live BTC price: ' + formatMoney(price) + ' • Updated ' + now.toLocaleTimeString();
+                    updateDisplay();
+                    saveState();
+                }
+            } catch (e) {
+                btcMetaText.textContent = 'Could not refresh BTC price right now.';
+            }
+        }
+
+        function showNotification(message) {
+            const notif = document.getElementById('notification');
+            notif.textContent = message;
+            notif.classList.add('show');
+            setTimeout(() => notif.classList.remove('show'), 2000);
+        }
+
+        function getAmountInput() {
+            const raw = document.getElementById('amountInput').value;
+            const amount = parseFloat(raw);
+            if (isNaN(amount)) return null;
+            return amount;
+        }
+
+        function addMoney() {
+            const amount = getAmountInput();
+            const desc = document.getElementById('descInput').value.trim();
+            if (amount === null || amount <= 0) { showNotification('Please enter a valid amount'); return; }
+            if (!desc) { showNotification('Please enter a description'); return; }
+
+            checkingBalance += amount;
+            const today = new Date();
+            const dateStr = (today.getMonth()+1) + '/' + today.getDate();
+
+            transactions.unshift({ date:dateStr, desc, amount, balance:checkingBalance });
+            updateDisplay();
+            renderHistory();
+            saveState();
+
+            document.getElementById('amountInput').value = '';
+            document.getElementById('descInput').value = '';
+            showNotification('Money added! +' + formatMoney(amount));
+        }
+
+        function spendMoney() {
+            const amount = getAmountInput();
+            const desc = document.getElementById('descInput').value.trim();
+            if (amount === null || amount <= 0) { showNotification('Please enter a valid amount'); return; }
+            if (!desc) { showNotification('Please enter a description'); return; }
+            if (amount > checkingBalance) { showNotification('Not enough money in checking!'); return; }
+
+            checkingBalance -= amount;
+            const today = new Date();
+            const dateStr = (today.getMonth()+1) + '/' + today.getDate();
+
+            transactions.unshift({ date:dateStr, desc, amount:-amount, balance:checkingBalance });
+            updateDisplay();
+            renderHistory();
+            saveState();
+
+            document.getElementById('amountInput').value = '';
+            document.getElementById('descInput').value = '';
+            showNotification('Purchase recorded! -' + formatMoney(amount));
+        }
+
+        function renderHistory() {
+            const historyList = document.getElementById('historyList');
+            historyList.innerHTML = '';
+            transactions.forEach(t => {
+                const item = document.createElement('div');
+                item.className = 'history-item';
+                const isPositive = t.amount > 0;
+                const sign = isPositive ? '+' : '-';
+                const amountClass = isPositive ? 'positive' : 'negative';
+                item.innerHTML = `
+                    <div class="history-left">
+                        <div class="history-date">${t.date}</div>
+                        <div class="history-desc">${t.desc}</div>
+                    </div>
+                    <div class="history-right">
+                        <div class="history-amount ${amountClass}">${sign}${formatMoney(t.amount)}</div>
+                        <div class="history-balance">Bal: ${formatMoney(t.balance)}</div>
+                    </div>
+                `;
+                historyList.appendChild(item);
+            });
+        }
+
+        loadState();
+        renderHistory();
+        updateDisplay();
+        fetchBtcPrice();
+        setInterval(fetchBtcPrice, 30000);
+    </script>
+</body>
+</html>
